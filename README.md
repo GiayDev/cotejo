@@ -35,6 +35,8 @@ Código de saída: `0` sem divergência, `1` com divergência (ou ilegível, com
 
 O padrão é `R$` + número + extenso entre parênteses, com o parêntese podendo quebrar linha. O número precisa estar no formato brasileiro (`1.234,56`, `1234,5`, `1234`).
 
+Em `.html`, a marcação é removida e as entidades comuns são decodificadas antes da busca; script, estilo e comentário são descartados.
+
 Do extenso ele aceita o que aparece na prática: `um mil`, `hum`, `catorze`/`quatorze`, vírgulas entre as classes, maiúsculas, `milhão de reais`, com ou sem a palavra `reais`. O que ele compara é o valor, não a ortografia dos conectivos; o texto em "esperado" segue uma convenção só, e outras formas corretas de escrever o mesmo valor também passam.
 
 Palavra que não existe (`reias`), ordem impossível (`vinte e trinta`) e sobra de texto aparecem como `ILEGÍVEL`, com o motivo. Campo de modelo não preenchido (`R$ 1.000,00 (valor por extenso)`) cai nessa categoria.
@@ -55,7 +57,7 @@ No `.docx`, ele lê o corpo, rodapés, cabeçalhos e notas. Texto apagado com co
 npm test
 ```
 
-São 31 testes com `node:test`, sem fixtures binárias: o `.docx` de teste é montado em tempo de execução. Cobrem valores escritos à mão a partir das regras (`cem`/`cento`, `mil e quinhentos`, `um milhão de reais`), leitura de variações, ida e volta (gerar o extenso e ler de volta) em todos os valores de R$ 0,00 a R$ 300,00 e em 20 mil valores pseudoaleatórios até 999 trilhões, o scanner com linhas e colunas, `.docx` com número partido em vários trechos de formatação, texto apagado e entidades XML, e a CLI com códigos de saída.
+São 33 testes com `node:test`, sem fixtures binárias: o `.docx` de teste é montado em tempo de execução. Cobrem valores escritos à mão a partir das regras (`cem`/`cento`, `mil e quinhentos`, `um milhão de reais`), leitura de variações, ida e volta (gerar o extenso e ler de volta) em todos os valores de R$ 0,00 a R$ 300,00 e em 20 mil valores pseudoaleatórios até 999 trilhões, o scanner com linhas e colunas, `.docx` com número partido em vários trechos de formatação, texto apagado e entidades XML, e a CLI com códigos de saída.
 
 A ida e volta sozinha só prova que o gerador e o leitor concordam entre si. Por isso, uma vez, fora do repositório, o leitor também foi conferido contra 7 mil frases geradas pela biblioteca `num2words` (pt_BR): leu todas corretamente. Os testes automáticos não dependem dela.
 

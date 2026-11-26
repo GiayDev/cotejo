@@ -1,7 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { conferir, lerNumero } from '../src/conferir.mjs';
-import { textoDeDocx, xmlWordParaTexto } from '../src/ler.mjs';
+import { textoDeDocx, xmlWordParaTexto, htmlParaTexto } from '../src/ler.mjs';
 import { docx, paragrafo, montarZip } from './ajudantes.mjs';
 
 test('par correto', () => {
@@ -106,4 +106,16 @@ test('docx: entrada sem compressão', () => {
   const xml = `<w:document xmlns:w="x"><w:body>${paragrafo('R$ 7,00 (sete reais)')}</w:body></w:document>`;
   const buf = montarZip([{ nome: 'word/document.xml', conteudo: xml, metodo: 0 }]);
   assert.equal(conferir(textoDeDocx(buf))[0].status, 'ok');
+});
+
+test('html: marcação no meio do valor, entidades, script e comentário', () => {
+  const html = '<p>Preço: R$&nbsp;<b>1.000</b>,00 (mil <i>reais</i>)</p><script>var x = "R$ 1,00 (dois reais)";</script><!-- R$ 2,00 (três reais) --><p>R$ 5,00 (cinco reais) &amp; mais</p>';
+  const achados = conferir(htmlParaTexto(html));
+  assert.deepEqual(achados.map((a) => [a.linha, a.status]), [[1, 'ok'], [2, 'ok']]);
+});
+
+test('frase real de declaração de dispensa publicada pela Conab (SEI 21218.000170/2024-02)', () => {
+  const [a] = conferir('2. O valor da contratação é de R$ 2.560,00 (dois mil quinhentos e sessenta reais) .');
+  assert.equal(a.status, 'ok');
+  assert.equal(a.coluna, 32);
 });

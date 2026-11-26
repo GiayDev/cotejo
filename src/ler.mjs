@@ -22,6 +22,7 @@ function decodificarEntidades(s) {
     .replace(/&gt;/g, '>')
     .replace(/&quot;/g, '"')
     .replace(/&apos;/g, "'")
+    .replace(/&nbsp;/g, '\u00a0')
     .replace(/&amp;/g, '&');
 }
 
@@ -37,6 +38,16 @@ export function xmlWordParaTexto(xml) {
   );
 }
 
+export function htmlParaTexto(html) {
+  return decodificarEntidades(
+    html
+      .replace(/<(script|style)\b[\s\S]*?<\/\1>/gi, '')
+      .replace(/<!--[\s\S]*?-->/g, '')
+      .replace(/<br\b[^>]*>|<\/(p|div|li|tr|h[1-6]|table|section|article)>/gi, '\n')
+      .replace(/<[^>]+>/g, ''),
+  );
+}
+
 export function textoDeDocx(buf) {
   const entradas = entradasZip(buf).filter((e) => PARTES_DOCX.test(e.nome));
   if (!entradas.some((e) => e.nome === 'word/document.xml')) throw new Error('word/document.xml não encontrado: não parece um .docx');
@@ -47,5 +58,6 @@ export function textoDeDocx(buf) {
 export function lerDocumento(caminho) {
   const buf = readFileSync(caminho);
   if (extname(caminho).toLowerCase() === '.docx') return textoDeDocx(buf);
-  return decodificarTexto(buf);
+  const texto = decodificarTexto(buf);
+  return /^\.html?$/i.test(extname(caminho)) ? htmlParaTexto(texto) : texto;
 }
