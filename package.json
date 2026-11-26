@@ -1,0 +1,11 @@
+{
+  "name": "cotejo",
+  "version": "0.1.0",
+  "description": "Confere se o valor em algarismos bate com o valor por extenso em contratos e outros documentos em português",
+  "type": "module",
+  "bin": { "cotejo": "bin/cotejo.mjs" },
+  "files": ["bin", "src"],
+  "engines": { "node": ">=20" },
+  "scripts": { "test": "node --test \"test/*.test.mjs\"" },
+  "license": "MIT"
+}
